@@ -1,0 +1,1 @@
+ALTER TABLE public.trades ADD COLUMN IF NOT EXISTS trade_journey jsonb DEFAULT NULL;

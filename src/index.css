@@ -1,0 +1,456 @@
+/* Sora + Inter loaded via <link> in index.html for preconnect performance. */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 0%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 2%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 160 84% 39%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 5%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 6%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 0 0% 5%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --gold: 42 80% 47%;
+    --gold-foreground: 0 0% 100%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 15%;
+    --ring: 160 84% 39%;
+    --radius: 0.375rem;
+    --radius-lg: 0.75rem;
+    --sidebar-background: 0 0% 0%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 160 84% 39%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 4%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 0 0% 9%;
+    --sidebar-ring: 160 84% 39%;
+
+    --font-heading: 'Sora', 'Inter', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+    --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+    --shadow-elevated: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+    --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-normal: 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .dark {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 0%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 2%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 160 84% 39%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 5%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 6%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 0 0% 5%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 76% 52%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --gold: 45 88% 58%;
+    --gold-foreground: 0 0% 8%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 15%;
+    --ring: 160 84% 39%;
+    --sidebar-background: 0 0% 0%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 160 84% 39%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 4%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 0 0% 9%;
+    --sidebar-ring: 160 84% 39%;
+
+    --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
+    --shadow-elevated: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  }
+
+  .theme-purple {
+    --background: 270 30% 5%;
+    --foreground: 270 20% 90%;
+    --card: 270 30% 8%;
+    --card-foreground: 270 20% 90%;
+    --popover: 270 30% 8%;
+    --popover-foreground: 270 20% 90%;
+    --primary: 270 80% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 270 25% 14%;
+    --secondary-foreground: 270 20% 90%;
+    --muted: 270 20% 18%;
+    --muted-foreground: 270 15% 60%;
+    --accent: 270 25% 14%;
+    --accent-foreground: 270 20% 90%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --border: 270 15% 25%;
+    --input: 270 15% 25%;
+    --ring: 270 80% 60%;
+    --sidebar-background: 270 30% 4%;
+    --sidebar-foreground: 270 20% 90%;
+    --sidebar-primary: 270 80% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 270 25% 12%;
+    --sidebar-accent-foreground: 270 20% 90%;
+    --sidebar-border: 270 15% 20%;
+    --sidebar-ring: 270 80% 60%;
+
+    --shadow-card: 0 1px 3px 0 rgba(100, 0, 200, 0.15), 0 1px 2px -1px rgba(100, 0, 200, 0.1);
+    --shadow-elevated: 0 4px 6px -1px rgba(100, 0, 200, 0.2), 0 2px 4px -2px rgba(100, 0, 200, 0.15);
+  }
+
+  .theme-sunset {
+    --background: 20 30% 5%;
+    --foreground: 30 20% 90%;
+    --card: 20 25% 9%;
+    --card-foreground: 30 20% 90%;
+    --popover: 20 25% 9%;
+    --popover-foreground: 30 20% 90%;
+    --primary: 25 95% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 20 20% 14%;
+    --secondary-foreground: 30 20% 90%;
+    --muted: 20 15% 18%;
+    --muted-foreground: 25 15% 58%;
+    --accent: 20 20% 14%;
+    --accent-foreground: 30 20% 90%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --border: 20 12% 24%;
+    --input: 20 12% 24%;
+    --ring: 25 95% 55%;
+    --sidebar-background: 20 30% 4%;
+    --sidebar-foreground: 30 20% 90%;
+    --sidebar-primary: 25 95% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 20 20% 11%;
+    --sidebar-accent-foreground: 30 20% 90%;
+    --sidebar-border: 20 12% 19%;
+    --sidebar-ring: 25 95% 55%;
+
+    --shadow-card: 0 1px 3px 0 rgba(200, 100, 0, 0.15), 0 1px 2px -1px rgba(200, 100, 0, 0.1);
+    --shadow-elevated: 0 4px 6px -1px rgba(200, 100, 0, 0.2), 0 2px 4px -2px rgba(200, 100, 0, 0.15);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    line-height: 1.6;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+  html {
+    @apply scroll-smooth;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+  h1 { letter-spacing: -0.03em; font-weight: 700; }
+  h1, h2, h3, h4, h5, h6, p, span, button, a, td, th, label {
+    overflow-wrap: break-word;
+  }
+  /* Card titles (shadcn) — apply Sora */
+  [data-slot="card-title"], .card-title {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+  /* Sidebar labels — slightly larger, Sora */
+  [data-sidebar="menu-button"], [data-sidebar="group-label"] {
+    font-family: var(--font-heading);
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    font-size: 0.875rem;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Global scrollbar suppression — preserve scroll, hide UI everywhere */
+  html, body, * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  *::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+  html, body { overflow-x: hidden; }
+  .font-heading {
+    font-family: var(--font-heading);
+    letter-spacing: -0.03em;
+  }
+  .font-body {
+    font-family: var(--font-body);
+  }
+  .font-mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+  /* Notion-style writing surface for journal blocks. */
+  .font-journal {
+    font-family: var(--journal-font, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);
+    font-size: 14.5px;
+    line-height: 1.7;
+    letter-spacing: -0.005em;
+  }
+  .font-journal p { margin: 0.4em 0; }
+  .font-journal ul, .font-journal ol { margin: 0.4em 0; padding-left: 1.2em; }
+  .font-journal li { margin: 0.18em 0; }
+
+  /* ============================================================
+     GLOBAL JOURNAL TYPOGRAPHY SYSTEM
+     Applied app-wide via html[data-journal-font="..."].
+     ============================================================ */
+  :root {
+    --journal-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  }
+  html[data-journal-font="notion"]    { --journal-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+  html[data-journal-font="jetbrains"] { --journal-font: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+  html[data-journal-font="ibm"]       { --journal-font: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+  html[data-journal-font="space"]     { --journal-font: "Space Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+  html[data-journal-font="fira"]      { --journal-font: "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace; }
+  html[data-journal-font="roboto"]    { --journal-font: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+  html[data-journal-font="source"]    { --journal-font: "Source Code Pro", ui-monospace, SFMono-Regular, Menlo, monospace; }
+  html[data-journal-font="geist"]     { --journal-font: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+  /* Apply selected font globally across sidebar + main + dialogs. */
+  html[data-journal-font] body,
+  html[data-journal-font] body * {
+    font-family: var(--journal-font) !important;
+    letter-spacing: -0.005em;
+  }
+  html[data-journal-font] h1,
+  html[data-journal-font] h2,
+  html[data-journal-font] h3,
+  html[data-journal-font] h4 { letter-spacing: -0.02em; }
+
+  /* Larger, more readable scale (trading terminal feel — not dev-console tiny). */
+  html[data-journal-font] body { font-size: 14.5px; line-height: 1.55; }
+  html[data-journal-font] .text-\[10px\] { font-size: 11px !important; }
+  html[data-journal-font] .text-\[11px\] { font-size: 12px !important; }
+  html[data-journal-font] .text-xs       { font-size: 12.5px !important; line-height: 1.5 !important; }
+  html[data-journal-font] .text-sm       { font-size: 13.5px !important; line-height: 1.55 !important; }
+  html[data-journal-font] .text-base     { font-size: 15px !important; }
+  html[data-journal-font] .text-lg       { font-size: 17px !important; }
+  html[data-journal-font] .text-xl       { font-size: 20px !important; }
+  html[data-journal-font] .text-2xl      { font-size: 24px !important; }
+  html[data-journal-font] .text-3xl      { font-size: 30px !important; }
+  .text-profit {
+    @apply text-success;
+  }
+  .text-loss {
+    @apply text-destructive;
+  }
+  .bg-profit {
+    background-color: hsl(var(--success) / 0.1);
+  }
+  .bg-loss {
+    background-color: hsl(var(--destructive) / 0.1);
+  }
+  .animate-in-fast {
+    animation: fadeIn var(--transition-fast) ease-out;
+  }
+  .metric-large {
+    @apply font-heading font-bold tracking-tight;
+    font-size: clamp(1.125rem, 2vw, 1.5rem);
+  }
+  .overflow-wrap-anywhere {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  .metric-small {
+    @apply font-mono text-sm font-medium;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4); }
+  50% { box-shadow: 0 0 0 8px hsl(var(--primary) / 0); }
+}
+
+/* ===== Tiptap rich text editor ===== */
+.tiptap {
+  outline: none;
+  overflow: visible;
+  max-height: none;
+}
+.ProseMirror {
+  overflow: visible !important;
+  max-height: none !important;
+}
+/* Plan / Journal text editors must auto-grow with content — never scroll internally. */
+.rich-content,
+.font-journal textarea {
+  overflow: visible;
+  max-height: none;
+  resize: none;
+}
+.tiptap p { margin: 0.25rem 0; }
+.tiptap h1 { font-size: 1.5rem; font-weight: 700; line-height: 1.2; margin: 0.75rem 0 0.5rem; }
+.tiptap h2 { font-size: 1.25rem; font-weight: 700; line-height: 1.25; margin: 0.65rem 0 0.4rem; }
+.tiptap h3 { font-size: 1.05rem; font-weight: 600; line-height: 1.3; margin: 0.55rem 0 0.35rem; }
+.tiptap u { text-decoration: underline; text-underline-offset: 2px; }
+.tiptap strong { font-weight: 700; }
+.tiptap em { font-style: italic; }
+.tiptap ul { list-style: disc; padding-left: 1.25rem; margin: 0.4rem 0; }
+.tiptap ol { list-style: decimal; padding-left: 1.25rem; margin: 0.4rem 0; }
+.tiptap li > p { margin: 0.1rem 0; }
+.tiptap blockquote {
+  border-left: 3px solid hsl(var(--primary) / 0.6);
+  padding: 0.15rem 0.75rem;
+  color: hsl(var(--muted-foreground));
+  margin: 0.5rem 0;
+  font-style: italic;
+}
+.tiptap code {
+  background: hsl(var(--muted));
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+}
+.tiptap mark { padding: 0 2px; border-radius: 3px; }
+.tiptap a { color: hsl(var(--primary)); text-decoration: underline; text-underline-offset: 2px; }
+.tiptap p.is-editor-empty:first-child::before {
+  color: hsl(var(--muted-foreground));
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Dark-mode safety: legacy / pasted content with hard-coded black or near-black
+   inline text colors must remain readable. Override only when *.dark* is active. */
+.dark .tiptap [style*="color: #000"],
+.dark .tiptap [style*="color:#000"],
+.dark .tiptap [style*="color: black"],
+.dark .tiptap [style*="color: rgb(0, 0, 0)"],
+.dark .tiptap [style*="color: rgb(0,0,0)"],
+.dark .prose [style*="color: #000"],
+.dark .prose [style*="color:#000"],
+.dark .prose [style*="color: black"],
+.dark .prose [style*="color: rgb(0, 0, 0)"],
+.dark .prose [style*="color: rgb(0,0,0)"] {
+  color: hsl(var(--foreground)) !important;
+}
+/* Render saved rich-text outside the editor (read-only views) with the same
+   typography and dark-mode safety as the Tiptap editor itself. */
+.rich-content {
+  color: hsl(var(--foreground));
+  font-family: var(--font-body);
+  line-height: 1.6;
+}
+.rich-content p { margin: 0.25rem 0; }
+.rich-content h1 { font-size: 1.5rem; font-weight: 700; line-height: 1.2; margin: 0.75rem 0 0.5rem; }
+.rich-content h2 { font-size: 1.25rem; font-weight: 700; line-height: 1.25; margin: 0.65rem 0 0.4rem; }
+.rich-content h3 { font-size: 1.05rem; font-weight: 600; line-height: 1.3; margin: 0.55rem 0 0.35rem; }
+.rich-content ul { list-style: disc; padding-left: 1.25rem; margin: 0.4rem 0; }
+.rich-content ol { list-style: decimal; padding-left: 1.25rem; margin: 0.4rem 0; }
+.rich-content u { text-decoration: underline; text-underline-offset: 2px; }
+.rich-content blockquote {
+  border-left: 3px solid hsl(var(--primary) / 0.6);
+  padding: 0.15rem 0.75rem;
+  color: hsl(var(--muted-foreground));
+  margin: 0.5rem 0;
+  font-style: italic;
+}
+.rich-content a { color: hsl(var(--primary)); text-decoration: underline; }
+.rich-content mark { padding: 0 2px; border-radius: 3px; }
+
+
+/* ============================================================
+   Recharts crosshair — theme-aware.
+   The default vertical hover line is pure white which is far too bright
+   on the dark palette. Route it through the shared muted-foreground token
+   so light theme stays crisp and dark theme becomes a subtle guide.
+   Applied globally so every chart (Dashboard, Analytics, Monthly P/L, etc.)
+   inherits without per-chart configuration.
+   ============================================================ */
+.recharts-tooltip-cursor {
+  stroke: hsl(var(--muted-foreground) / 0.35) !important;
+  stroke-width: 1px !important;
+}
+:root.dark .recharts-tooltip-cursor,
+.dark .recharts-tooltip-cursor {
+  stroke: rgba(255, 255, 255, 0.18) !important;
+}
+/* Rectangular cursor (bar-chart hover) — softer fill on both themes. */
+rect.recharts-tooltip-cursor {
+  fill: hsl(var(--muted) / 0.18) !important;
+  stroke: none !important;
+}
+
+
+/* Phase 2 psychology cards: force Inter (never monospace journal font). */
+.p2-inter,
+.p2-inter *,
+html[data-journal-font] .p2-inter,
+html[data-journal-font] .p2-inter * {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  letter-spacing: normal;
+}

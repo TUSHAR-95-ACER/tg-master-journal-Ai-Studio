@@ -1,0 +1,1 @@
+ALTER TABLE public.daily_plans ADD COLUMN IF NOT EXISTS review_video jsonb;

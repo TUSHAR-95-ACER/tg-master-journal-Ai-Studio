@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TG Master Journal — Professional Trading Operating System</title>
+    <meta name="description" content="TG Master Journal is a professional trading journal and analytics workspace for serious traders — log trades, review setups, and track performance." />
+    <meta name="author" content="TG Master Journal" />
+    <meta name="google-site-verification" content="9AdS62RduSilCk501hAfXS6RxLqy-Wi7LqJheYpiUQg" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="TG Master Journal" />
+    <meta property="og:title" content="TG Master Journal — Professional Trading Operating System" />
+    <meta property="og:description" content="Log trades, review setups, plan sessions, and analyze your edge — a professional journal built for serious traders." />
+    <meta property="og:url" content="/" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="TG Master Journal — Professional Trading Operating System" />
+    <meta name="twitter:description" content="Log trades, review setups, plan sessions, and analyze your edge — a professional journal built for serious traders." />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Fira+Code:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "TG Master Journal",
+        "url": "https://master-journal-tg.lovable.app/",
+        "description": "Professional trading journal and analytics workspace for serious traders."
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "TG Master Journal",
+        "url": "https://master-journal-tg.lovable.app/"
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "TG Master Journal",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web",
+        "url": "https://master-journal-tg.lovable.app/",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      }
+    </script>
+    <script>
+      (function() {
+        try {
+          var h = window.location.hash || '';
+          var s = window.location.search || '';
+          var href = window.location.href || '';
+          var isRecovery = h.indexOf('type=recovery') !== -1 || s.indexOf('type=recovery') !== -1 || href.indexOf('type=recovery') !== -1 || (h.indexOf('access_token=') !== -1 && h.indexOf('recovery') !== -1);
+          if (isRecovery) {
+            var now = String(Date.now());
+            sessionStorage.setItem('tg_password_recovery_active', 'true');
+            sessionStorage.setItem('tg_password_recovery_time', now);
+            localStorage.setItem('tg_password_recovery_active', 'true');
+            localStorage.setItem('tg_password_recovery_time', now);
+            if (window.location.pathname !== '/reset-password') {
+              var newUrl = window.location.origin + '/reset-password' + s + h;
+              window.history.replaceState(null, '', newUrl);
+            }
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <style>
+      #tg-splash{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#050505;color:#D4AF37;font-family:'Sora',system-ui,sans-serif;transition:opacity .4s ease}
+      #tg-splash.hide{opacity:0;pointer-events:none}
+      #tg-splash .logo{font-size:22px;font-weight:700;letter-spacing:.24em;text-transform:uppercase}
+      #tg-splash .sub{font-size:11px;letter-spacing:.3em;color:#10B981;text-transform:uppercase}
+      #tg-splash .spin{width:26px;height:26px;border-radius:50%;border:2px solid rgba(16,185,129,.25);border-top-color:#10B981;animation:tg-spin 1s linear infinite;margin-top:6px}
+      @keyframes tg-spin{to{transform:rotate(360deg)}}
+    </style>
+  </head>
+  <body>
+    <div id="tg-splash"><div class="logo">TG Master Journal</div><div class="sub">Professional Trading OS</div><div class="spin"></div></div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>window.addEventListener('load',()=>{setTimeout(()=>{var s=document.getElementById('tg-splash');if(s){s.classList.add('hide');setTimeout(()=>s.remove(),450);}},350);});</script>
+  </body>
+</html>

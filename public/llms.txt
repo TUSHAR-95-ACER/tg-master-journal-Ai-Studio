@@ -1,0 +1,34 @@
+# TG Master Journal
+
+> Professional trading journal and analytics workspace for serious traders — log trades, review setups, plan sessions, and analyze your edge.
+
+TG Master Journal is a web application for discretionary forex and futures traders. It combines a trade journal, planning tools, analytics, behavioral insights, and AI-driven coaching into a single workspace.
+
+## Pages
+
+- [Dashboard](/): Overview of trading performance, equity curve, and recent trades.
+- [Trades](/trades): Logged trades with grades, RR, screenshots, and execution notes.
+- [Analytics](/analytics): Performance analytics by pair, session, weekday, grade, and setup.
+- [Macro Intelligence](/macro-intelligence): Institutional macro decision terminal for Fed, USD, and gold bias.
+- [Weekly Plans](/weekly-plan): Plan the trading week — bias, levels, and scenarios.
+- [Daily Plans](/daily-plan): Pre-session daily plan and rules.
+- [Notebook](/notebook): Research notes, charts, and links.
+- [Weekly Review](/weekly-review): Performance and behavioral review of the trading week.
+- [Setup Playbook](/setup-playbook): Documented trading setups with rules and examples.
+- [Psychology](/psychology): Track emotional state and discipline.
+- [Mistakes](/mistakes): Catalog of recurring execution mistakes.
+- [Behavior Patterns](/behavior-patterns): Detection of overtrading, FOMO, and revenge trading.
+- [Trade Quality](/trade-quality): Execution quality by grade and confluence.
+- [Bias Analytics](/bias-analytics): Accuracy of daily and weekly directional biases.
+- [AI Insights](/ai-insights): AI-driven behavioral insights and risk alerts.
+- [Trading Rules](/trading-rules): Codified trading rules and risk limits.
+- [Research Lab](/research-lab): Backtesting and chart replay separate from live trades.
+- [Calendar](/calendar): Calendar view of trades and plans.
+- [Accounts](/accounts): Funded and prop account tracking.
+- [System Analytics](/system-analytics): System-level RR and drawdown analytics.
+- [Control Center](/control-center): Manage sessions, tags, and grades.
+
+## Optional
+
+- [Settings](/settings): Workspace preferences and account settings.
+- [Sign in](/login): Account sign-in page.

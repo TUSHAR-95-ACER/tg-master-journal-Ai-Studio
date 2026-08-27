@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://master-journal-tg.lovable.app/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/trades</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/accounts</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/analytics</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/psychology</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/mistakes</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/weekly-plan</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/daily-plan</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/notebook</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/weekly-review</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/setup-playbook</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/behavior-patterns</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/trade-quality</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/ai-insights</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/trading-rules</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/bias-analytics</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/control-center</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/research-lab</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/calendar</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/system-analytics</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/macro-intelligence</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+  <url><loc>https://master-journal-tg.lovable.app/login</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+</urlset>

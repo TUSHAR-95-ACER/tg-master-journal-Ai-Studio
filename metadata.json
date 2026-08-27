@@ -1,0 +1,6 @@
+{
+  "name": "Vista Schedule",
+  "description": "Trading journal, schedule mirror, and performance analytics dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

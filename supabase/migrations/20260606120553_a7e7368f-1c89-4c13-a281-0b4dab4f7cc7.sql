@@ -1,0 +1,1 @@
+ALTER TABLE public.macro_analyses ADD COLUMN IF NOT EXISTS ai_enriched jsonb DEFAULT '{}'::jsonb;
