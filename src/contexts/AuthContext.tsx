@@ -13,7 +13,8 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string, fullName?: string) => Promise<void>;
-  sendMagicLink: (email: string) => Promise<void>;
+  signInWithPhone: (phoneE164: string) => Promise<void>;
+  verifyPhoneOtp: (phoneE164: string, token: string) => Promise<void>;
   resetPasswordForEmail: (email: string) => Promise<void>;
   updatePassword: (password: string) => Promise<void>;
   signInAsDemo: () => void;
@@ -220,15 +221,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error;
   };
 
-  const sendMagicLink = async (email: string) => {
+  const signInWithPhone = async (phoneE164: string) => {
     clearLocalAuthCache();
     const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: window.location.origin,
-      },
+      phone: phoneE164,
+      options: { shouldCreateUser: true },
     });
     if (error) throw error;
+  };
+
+  const verifyPhoneOtp = async (phoneE164: string, token: string) => {
+    const { data, error } = await supabase.auth.verifyOtp({
+      phone: phoneE164,
+      token,
+      type: 'sms',
+    });
+    if (error) throw error;
+    if (!data.session) {
+      throw new Error('Verification succeeded but no session was returned. Please try again.');
+    }
+    setSession(data.session);
+    setUser(data.user ?? data.session.user);
   };
 
   const resetPasswordForEmail = async (email: string) => {
@@ -267,7 +280,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signInWithGoogle,
       signInWithEmail,
       signUpWithEmail,
-      sendMagicLink,
+      signInWithPhone,
+      verifyPhoneOtp,
       resetPasswordForEmail,
       updatePassword,
       signInAsDemo,

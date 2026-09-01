@@ -26,3 +26,16 @@ dist-ssr
 # Tauri
 src-tauri/target
 src-tauri/gen
+
+# Env / local secrets
+.env
+.env.*
+!.env.example
+
+# Supabase CLI transient cache
+supabase/.temp/
+
+# Local probe / debug scripts
+probe-*.mjs
+diag.mjs
+inttest.mjs

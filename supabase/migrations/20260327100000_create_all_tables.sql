@@ -1,5 +1,5 @@
 -- Profiles table
-CREATE TABLE public.profiles (
+CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   display_name TEXT,
   avatar_url TEXT,
@@ -8,9 +8,9 @@ CREATE TABLE public.profiles (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can view own profile" ON public.profiles FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
-CREATE POLICY "Users can insert own profile" ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
+DO $$ BEGIN CREATE POLICY "Users can view own profile" ON public.profiles FOR SELECT USING (auth.uid() = id); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE POLICY "Users can insert own profile" ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id); EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
@@ -27,7 +27,7 @@ END;
 $$;
 CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
-CREATE TABLE public.trading_accounts (
+CREATE TABLE IF NOT EXISTS public.trading_accounts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   name TEXT NOT NULL, broker TEXT NOT NULL DEFAULT '', type TEXT NOT NULL DEFAULT 'Personal',
@@ -42,7 +42,7 @@ CREATE TABLE public.trading_accounts (
 ALTER TABLE public.trading_accounts ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users crud own accounts" ON public.trading_accounts FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
-CREATE TABLE public.trades (
+CREATE TABLE IF NOT EXISTS public.trades (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   date TEXT NOT NULL, entry_time TEXT, exit_time TEXT, market TEXT NOT NULL, asset TEXT NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE public.trades (
 ALTER TABLE public.trades ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users crud own trades" ON public.trades FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
-CREATE TABLE public.transactions (
+CREATE TABLE IF NOT EXISTS public.transactions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   date TEXT NOT NULL, account_id TEXT NOT NULL, type TEXT NOT NULL, amount NUMERIC DEFAULT 0,
@@ -67,7 +67,7 @@ CREATE TABLE public.transactions (
 ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users crud own transactions" ON public.transactions FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
-CREATE TABLE public.scale_events (
+CREATE TABLE IF NOT EXISTS public.scale_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   account_id TEXT NOT NULL, date TEXT NOT NULL, old_size NUMERIC DEFAULT 0,
@@ -76,7 +76,7 @@ CREATE TABLE public.scale_events (
 ALTER TABLE public.scale_events ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users crud own scale_events" ON public.scale_events FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
-CREATE TABLE public.weekly_plans (
+CREATE TABLE IF NOT EXISTS public.weekly_plans (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   week_start TEXT NOT NULL, bias TEXT DEFAULT '', markets JSONB DEFAULT '[]', setups JSONB DEFAULT '[]',
@@ -87,7 +87,7 @@ CREATE TABLE public.weekly_plans (
 ALTER TABLE public.weekly_plans ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users crud own weekly_plans" ON public.weekly_plans FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
-CREATE TABLE public.daily_plans (
+CREATE TABLE IF NOT EXISTS public.daily_plans (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   date TEXT NOT NULL, daily_bias TEXT DEFAULT 'Neutral', session_focus TEXT DEFAULT 'London',
@@ -99,7 +99,7 @@ CREATE TABLE public.daily_plans (
 ALTER TABLE public.daily_plans ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users crud own daily_plans" ON public.daily_plans FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
-CREATE TABLE public.notebook_entries (
+CREATE TABLE IF NOT EXISTS public.notebook_entries (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   date TEXT NOT NULL, pair TEXT DEFAULT '', category TEXT DEFAULT '', bias TEXT DEFAULT '',
@@ -109,7 +109,7 @@ CREATE TABLE public.notebook_entries (
 ALTER TABLE public.notebook_entries ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users crud own notebook_entries" ON public.notebook_entries FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
-CREATE TABLE public.checklist_days (
+CREATE TABLE IF NOT EXISTS public.checklist_days (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   date TEXT NOT NULL, items JSONB DEFAULT '{}', score NUMERIC DEFAULT 0,
@@ -118,7 +118,7 @@ CREATE TABLE public.checklist_days (
 ALTER TABLE public.checklist_days ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users crud own checklist_days" ON public.checklist_days FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
-CREATE TABLE public.checklist_items (
+CREATE TABLE IF NOT EXISTS public.checklist_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   item_id TEXT NOT NULL, label TEXT NOT NULL, sort_order INTEGER DEFAULT 0,
@@ -127,7 +127,7 @@ CREATE TABLE public.checklist_items (
 ALTER TABLE public.checklist_items ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users crud own checklist_items" ON public.checklist_items FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
-CREATE TABLE public.tool_entries (
+CREATE TABLE IF NOT EXISTS public.tool_entries (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   name TEXT NOT NULL, category TEXT DEFAULT '', description TEXT DEFAULT '', status TEXT DEFAULT '',
@@ -137,7 +137,7 @@ CREATE TABLE public.tool_entries (
 ALTER TABLE public.tool_entries ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users crud own tool_entries" ON public.tool_entries FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
-CREATE TABLE public.backtesting_sessions (
+CREATE TABLE IF NOT EXISTS public.backtesting_sessions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   pair TEXT NOT NULL, month TEXT NOT NULL, entries JSONB DEFAULT '[]',
@@ -146,7 +146,7 @@ CREATE TABLE public.backtesting_sessions (
 ALTER TABLE public.backtesting_sessions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users crud own backtesting_sessions" ON public.backtesting_sessions FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
-CREATE TABLE public.user_settings (
+CREATE TABLE IF NOT EXISTS public.user_settings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL UNIQUE,
   custom_setups JSONB DEFAULT '[]', custom_assets JSONB DEFAULT '[]',

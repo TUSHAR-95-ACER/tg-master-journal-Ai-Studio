@@ -1,15 +1,66 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
-import { Mail, Lock, User, LogIn } from 'lucide-react';
+import { Mail, Lock, User, LogIn, Phone, ArrowLeft } from 'lucide-react';
 import { RouteSeo } from '@/components/seo/RouteSeo';
 import { savePostLoginNext } from '@/components/auth/PostLoginRedirect';
 import { isRecoveryActive } from '@/lib/recoveryState';
+
+type AuthTab = 'signin' | 'phone' | 'signup';
+
+const RESEND_SECONDS = 60;
+
+type Country = { code: string; name: string; dial: string; flag: string };
+
+const COUNTRIES: Country[] = [
+  { code: 'IN', name: 'India', dial: '+91', flag: '🇮🇳' },
+  { code: 'US', name: 'United States', dial: '+1', flag: '🇺🇸' },
+  { code: 'GB', name: 'United Kingdom', dial: '+44', flag: '🇬🇧' },
+  { code: 'CA', name: 'Canada', dial: '+1', flag: '🇨🇦' },
+  { code: 'AU', name: 'Australia', dial: '+61', flag: '🇦🇺' },
+  { code: 'DE', name: 'Germany', dial: '+49', flag: '🇩🇪' },
+  { code: 'FR', name: 'France', dial: '+33', flag: '🇫🇷' },
+  { code: 'IT', name: 'Italy', dial: '+39', flag: '🇮🇹' },
+  { code: 'ES', name: 'Spain', dial: '+34', flag: '🇪🇸' },
+  { code: 'NL', name: 'Netherlands', dial: '+31', flag: '🇳🇱' },
+  { code: 'SE', name: 'Sweden', dial: '+46', flag: '🇸🇪' },
+  { code: 'NO', name: 'Norway', dial: '+47', flag: '🇳🇴' },
+  { code: 'DK', name: 'Denmark', dial: '+45', flag: '🇩🇰' },
+  { code: 'FI', name: 'Finland', dial: '+358', flag: '🇫🇮' },
+  { code: 'IE', name: 'Ireland', dial: '+353', flag: '🇮🇪' },
+  { code: 'PT', name: 'Portugal', dial: '+351', flag: '🇵🇹' },
+  { code: 'CH', name: 'Switzerland', dial: '+41', flag: '🇨🇭' },
+  { code: 'AT', name: 'Austria', dial: '+43', flag: '🇦🇹' },
+  { code: 'BE', name: 'Belgium', dial: '+32', flag: '🇧🇪' },
+  { code: 'PL', name: 'Poland', dial: '+48', flag: '🇵🇱' },
+  { code: 'SG', name: 'Singapore', dial: '+65', flag: '🇸🇬' },
+  { code: 'HK', name: 'Hong Kong', dial: '+852', flag: '🇭🇰' },
+  { code: 'JP', name: 'Japan', dial: '+81', flag: '🇯🇵' },
+  { code: 'KR', name: 'South Korea', dial: '+82', flag: '🇰🇷' },
+  { code: 'AE', name: 'United Arab Emirates', dial: '+971', flag: '🇦🇪' },
+  { code: 'SA', name: 'Saudi Arabia', dial: '+966', flag: '🇸🇦' },
+  { code: 'ZA', name: 'South Africa', dial: '+27', flag: '🇿🇦' },
+  { code: 'BR', name: 'Brazil', dial: '+55', flag: '🇧🇷' },
+  { code: 'MX', name: 'Mexico', dial: '+52', flag: '🇲🇽' },
+  { code: 'NZ', name: 'New Zealand', dial: '+64', flag: '🇳🇿' },
+];
+
+function sanitizeNationalNumber(raw: string): string {
+  return raw.replace(/[^\d]/g, '').replace(/^0+/, '');
+}
+
+function toE164(dial: string, national: string): string {
+  const n = sanitizeNationalNumber(national);
+  if (!n) return '';
+  // dial already includes the leading '+'
+  return `${dial}${n}`;
+}
 
 function safeNext(raw: string | null): string {
   if (!raw) return '/';
@@ -18,17 +69,59 @@ function safeNext(raw: string | null): string {
 }
 
 export default function Login() {
-  const { user, loading, isPasswordRecovery, signInWithGoogle, signInWithEmail, signUpWithEmail, sendMagicLink, resetPasswordForEmail, signInAsDemo } = useAuth();
+  const { user, loading, isPasswordRecovery, signInWithGoogle, signInWithEmail, signUpWithEmail, signInWithPhone, verifyPhoneOtp, resetPasswordForEmail, signInAsDemo } = useAuth();
   const [params] = useSearchParams();
   const nextPath = safeNext(params.get('next'));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [magicLinkSent, setMagicLinkSent] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [authTab, setAuthTab] = useState<'signin' | 'signup' | 'magic'>('signin');
+  const [authTab, setAuthTab] = useState<AuthTab>('signin');
+
+  // Phone OTP state
+  const defaultCountry = useMemo<Country>(() => COUNTRIES.find((c) => c.code === 'IN') ?? COUNTRIES[0], []);
+  const [country, setCountry] = useState<Country>(defaultCountry);
+  const [nationalNumber, setNationalNumber] = useState('');
+  const [otpStage, setOtpStage] = useState<'enter' | 'verify'>('enter');
+  const [otpToken, setOtpToken] = useState('');
+  const [phoneSending, setPhoneSending] = useState(false);
+  const [phoneVerifying, setPhoneVerifying] = useState(false);
+  const [resendSeconds, setResendSeconds] = useState(0);
+  const resendIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const phoneE164 = useMemo(() => toE164(country.dial, nationalNumber), [country.dial, nationalNumber]);
+
+  useEffect(() => {
+    if (resendSeconds <= 0) {
+      if (resendIntervalRef.current) {
+        clearInterval(resendIntervalRef.current);
+        resendIntervalRef.current = null;
+      }
+      return;
+    }
+    const id = setInterval(() => {
+      setResendSeconds((s) => (s > 0 ? s - 1 : 0));
+    }, 1000);
+    resendIntervalRef.current = id;
+    return () => {
+      clearInterval(id);
+      if (resendIntervalRef.current === id) resendIntervalRef.current = null;
+    };
+  }, [resendSeconds]);
+
+  useEffect(() => {
+    // When leaving the Phone tab, drop any in-flight OTP session.
+    if (authTab !== 'phone' && otpStage === 'verify') {
+      setOtpStage('enter');
+      setOtpToken('');
+      setNationalNumber('');
+      setResendSeconds(0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authTab]);
+
   const authBusy = loading || submitting;
 
   if (loading) {
@@ -62,7 +155,7 @@ export default function Login() {
       if (/missing OAuth secret|validation_failed|Unsupported provider/i.test(msg)) {
         toast({
           title: 'Google OAuth not enabled on backend',
-          description: 'Please sign in with Email & Password or Instant Magic Link below to access your account.',
+          description: 'Please sign in with Email & Password, Phone, or Google below to access your account.',
           variant: 'destructive',
         });
         return;
@@ -86,7 +179,7 @@ export default function Login() {
         setAuthError('invalid_credentials');
         toast({
           title: 'Invalid email or password',
-          description: 'No password found for this account or password was incorrect. You can sign in instantly with a Magic Link or create a password.',
+          description: 'No password found for this account or the password was incorrect. Use the Sign Up tab to create a password, or sign in with Phone or Google.',
           variant: 'destructive',
         });
       } else {
@@ -98,23 +191,63 @@ export default function Login() {
     }
   };
 
-  const handleMagicLink = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!email) {
-      toast({ title: 'Email required', description: 'Please enter your email address first', variant: 'destructive' });
+  const sendPhoneOtp = async () => {
+    if (!phoneE164) {
+      toast({ title: 'Phone number required', description: 'Please enter your phone number to receive a code.', variant: 'destructive' });
       return;
     }
-    setSubmitting(true);
-    setAuthError(null);
+    setPhoneSending(true);
     try {
-      await sendMagicLink(email);
-      setMagicLinkSent(true);
-      toast({ title: 'Magic link sent!', description: `Check your inbox at ${email} to sign in instantly.` });
+      await signInWithPhone(phoneE164);
+      setOtpStage('verify');
+      setOtpToken('');
+      setResendSeconds(RESEND_SECONDS);
+      toast({
+        title: 'Verification code sent',
+        description: `A 6-digit code has been sent to ${phoneE164}.`,
+      });
     } catch (err: any) {
-      toast({ title: 'Could not send link', description: err?.message || 'Please try email & password', variant: 'destructive' });
+      const msg = err?.message || 'Could not send verification code';
+      toast({ title: 'Could not send code', description: msg, variant: 'destructive' });
     } finally {
-      setSubmitting(false);
+      setPhoneSending(false);
     }
+  };
+
+  const handleSendPhoneOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await sendPhoneOtp();
+  };
+
+  const handleVerifyPhoneOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const token = otpToken.trim();
+    if (!/^\d{6}$/.test(token)) {
+      toast({ title: 'Enter the 6-digit code', description: 'The code must be exactly 6 digits.', variant: 'destructive' });
+      return;
+    }
+    setPhoneVerifying(true);
+    try {
+      savePostLoginNext(nextPath);
+      await verifyPhoneOtp(phoneE164, token);
+    } catch (err: any) {
+      const msg = err?.message || 'Incorrect code. Please try again.';
+      toast({ title: 'Verification failed', description: msg, variant: 'destructive' });
+    } finally {
+      setPhoneVerifying(false);
+    }
+  };
+
+  const handleResendPhoneOtp = async () => {
+    if (resendSeconds > 0) return;
+    await sendPhoneOtp();
+  };
+
+  const handleChangePhoneNumber = () => {
+    setOtpStage('enter');
+    setOtpToken('');
+    setResendSeconds(0);
+    setNationalNumber('');
   };
 
   const handleForgotPassword = async () => {
@@ -200,11 +333,11 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Email/Password / Magic Link */}
-          <Tabs value={authTab} onValueChange={(v) => setAuthTab(v as 'signin' | 'signup' | 'magic')}>
+          {/* Email/Password / Phone / Sign Up */}
+          <Tabs value={authTab} onValueChange={(v) => setAuthTab(v as AuthTab)}>
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="magic">Magic Link</TabsTrigger>
+              <TabsTrigger value="phone">Phone</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
             </TabsList>
 
@@ -261,7 +394,7 @@ export default function Login() {
                   <div className="p-3.5 text-xs bg-destructive/10 border border-destructive/20 rounded-xl space-y-2 text-foreground">
                     <p className="font-semibold text-destructive">Invalid email or password</p>
                     <p className="text-muted-foreground">
-                      If you haven't set a password or originally used Google, you can log in instantly or create a new password:
+                      No password is set on this account, or the password is incorrect. Use the Sign Up tab to create a password, or sign in with Phone or Google.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-2 pt-1">
                       <Button
@@ -269,10 +402,10 @@ export default function Login() {
                         size="sm"
                         variant="secondary"
                         className="h-8 text-xs font-semibold"
-                        onClick={() => handleMagicLink()}
+                        onClick={() => setAuthTab('phone')}
                         disabled={authBusy}
                       >
-                        Send Magic Link
+                        Sign in with Phone
                       </Button>
                       <Button
                         type="button"
@@ -295,7 +428,7 @@ export default function Login() {
                       If an account with a password exists for <strong>{email}</strong>, instructions were sent to your inbox.
                     </p>
                     <p className="text-muted-foreground pt-1">
-                      <em>Tip:</em> If you originally registered with Google or Magic Link without a password, use the <strong>Magic Link</strong> tab to sign in instantly.
+                      <em>Tip:</em> If you originally registered with Google, you can also sign in with Phone from the Phone tab.
                     </p>
                   </div>
                 )}
@@ -307,35 +440,106 @@ export default function Login() {
               </form>
             </TabsContent>
 
-            <TabsContent value="magic">
-              <form onSubmit={handleMagicLink} className="space-y-4 mt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="magic-email">Email Address</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <TabsContent value="phone">
+              {otpStage === 'enter' ? (
+                <form onSubmit={handleSendPhoneOtp} className="space-y-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="phone-country">Country</Label>
+                    <Select
+                      value={country.code}
+                      onValueChange={(v) => {
+                        const next = COUNTRIES.find((c) => c.code === v);
+                        if (next) setCountry(next);
+                      }}
+                    >
+                      <SelectTrigger id="phone-country" className="h-11 rounded-xl">
+                        <SelectValue placeholder="Select country" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-72">
+                        {COUNTRIES.map((c) => (
+                          <SelectItem key={c.code} value={c.code}>
+                            <span className="mr-2">{c.flag}</span>
+                            {c.name} ({c.dial})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone-number">Phone number</Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <div className="absolute left-9 top-0 bottom-0 flex items-center text-sm font-mono text-muted-foreground border-r border-border pr-2">
+                        {country.dial}
+                      </div>
+                      <Input
+                        id="phone-number"
+                        type="tel"
+                        inputMode="numeric"
+                        autoComplete="tel-national"
+                        placeholder="98765 43210"
+                        className="pl-[5.5rem]"
+                        value={nationalNumber}
+                        onChange={(e) => setNationalNumber(e.target.value)}
+                        disabled={phoneSending}
+                        required
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      We'll send a 6-digit verification code by SMS to {phoneE164 || `${country.dial} …`}.
+                    </p>
+                  </div>
+                  <Button type="submit" className="w-full h-11 rounded-xl" disabled={phoneSending || !phoneE164}>
+                    {phoneSending ? 'Sending code...' : 'Send OTP'}
+                  </Button>
+                </form>
+              ) : (
+                <form onSubmit={handleVerifyPhoneOtp} className="space-y-4 mt-4">
+                  <div className="p-3 text-xs bg-primary/10 border border-primary/20 rounded-lg text-foreground">
+                    Enter the 6-digit code sent to <strong className="font-mono">{phoneE164}</strong>.
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone-otp">Verification code</Label>
                     <Input
-                      id="magic-email"
-                      type="email"
-                      placeholder="you@example.com"
-                      className="pl-9"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      id="phone-otp"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      placeholder="123456"
+                      maxLength={6}
+                      pattern="[0-9]{6}"
+                      className="h-12 text-center text-xl font-mono tracking-[0.4em] rounded-xl"
+                      value={otpToken}
+                      onChange={(e) => setOtpToken(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      disabled={phoneVerifying}
+                      autoFocus
                       required
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    We will send a one-click login link to your inbox. No password required.
-                  </p>
-                </div>
-                {magicLinkSent && (
-                  <div className="p-3 text-xs bg-primary/10 border border-primary/20 rounded-lg text-foreground">
-                    Check your email inbox for your secure login link.
+                  <Button type="submit" className="w-full h-11 rounded-xl" disabled={phoneVerifying || !/^\d{6}$/.test(otpToken)}>
+                    {phoneVerifying ? 'Verifying...' : 'Verify & Sign In'}
+                  </Button>
+                  <div className="flex items-center justify-between text-xs pt-1">
+                    <button
+                      type="button"
+                      onClick={handleChangePhoneNumber}
+                      className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
+                      disabled={phoneVerifying}
+                    >
+                      <ArrowLeft className="h-3 w-3" />
+                      Change phone number
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleResendPhoneOtp}
+                      className={resendSeconds > 0 ? 'text-muted-foreground cursor-not-allowed' : 'text-primary hover:underline'}
+                      disabled={resendSeconds > 0 || phoneSending}
+                    >
+                      {resendSeconds > 0 ? `Resend OTP in ${resendSeconds}s` : 'Resend OTP'}
+                    </button>
                   </div>
-                )}
-                <Button type="submit" className="w-full h-11 rounded-xl" disabled={authBusy}>
-                  {submitting ? 'Sending link...' : 'Send Magic Link'}
-                </Button>
-              </form>
+                </form>
+              )}
             </TabsContent>
 
             <TabsContent value="signup">
@@ -404,7 +608,7 @@ export default function Login() {
           </div>
 
           <p className="text-xs text-muted-foreground text-center">
-            Sign in with Google, Email, or test with Demo Access
+            Sign in with Google, Email, Phone, or test with Demo Access
           </p>
         </div>
       </div>

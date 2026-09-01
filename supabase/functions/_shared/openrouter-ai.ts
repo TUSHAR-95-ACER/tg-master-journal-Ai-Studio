@@ -1,22 +1,26 @@
-// Shared Lovable AI Gateway client (Google Gemini) for all journal AI features.
-// OpenAI Chat Completions–compatible.
+// Shared OpenRouter client for all journal AI features.
+// OpenAI Chat Completions-compatible.
 //
-// Auth: LOVABLE_API_KEY (auto-provisioned by Lovable Cloud, never exposed to client).
+// Auth: OPENROUTER_API_KEY (set in Supabase Edge Function secrets; never exposed to client).
+// Optional headers (set when APP_URL is available):
+//   HTTP-Referer: APP_URL   (recommended by OpenRouter for app attribution)
+//   X-Title: tg-master-journal
 //
-// Tier routing:
-//   "haiku"  -> google/gemini-2.5-flash-lite  (cheap/fast: chips, panels)
-//   "sonnet" -> google/gemini-2.5-flash       (default: insights, mentor, vision, brief, macro)
-//   "opus"   -> google/gemini-2.5-pro         (deep / full-journal only)
+// Model pinning (strategy B):
+//   All tiers (haiku / sonnet / opus) -> minimax/minimax-m3:free
+//   Pinned intentionally for predictable behavior on the free tier.
+//   To switch, change MODEL_BY_TIER below.
 
 export type AiTier = "haiku" | "sonnet" | "opus";
 
-const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+const GATEWAY_URL = "https://openrouter.ai/api/v1/chat/completions";
+const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
+const APP_URL = Deno.env.get("APP_URL");
 
 const MODEL_BY_TIER: Record<AiTier, string> = {
-  haiku:  "google/gemini-2.5-flash-lite",
-  sonnet: "google/gemini-2.5-flash",
-  opus:   "google/gemini-2.5-pro",
+  haiku:  "minimax/minimax-m3:free",
+  sonnet: "minimax/minimax-m3:free",
+  opus:   "minimax/minimax-m3:free",
 };
 
 export type OAITextPart  = { type: "text"; text: string };
@@ -47,6 +51,17 @@ export class AiError extends Error {
   constructor(status: number, message: string) { super(message); this.status = status; }
 }
 
+function buildHeaders(accept: string): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Accept: accept,
+    Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+  };
+  if (APP_URL) headers["HTTP-Referer"] = APP_URL;
+  headers["X-Title"] = "tg-master-journal";
+  return headers;
+}
+
 function buildBody(req: AiChatRequest, stream = false) {
   const body: any = {
     model: MODEL_BY_TIER[req.tier],
@@ -63,14 +78,10 @@ function buildBody(req: AiChatRequest, stream = false) {
 }
 
 async function callGateway(body: any, accept: string) {
-  if (!LOVABLE_API_KEY) throw new AiError(500, "LOVABLE_API_KEY not configured");
+  if (!OPENROUTER_API_KEY) throw new AiError(500, "OPENROUTER_API_KEY not configured");
   const resp = await fetch(GATEWAY_URL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${LOVABLE_API_KEY}`,
-      Accept: accept,
-    },
+    headers: buildHeaders(accept),
     body: JSON.stringify(body),
   });
   return resp;
@@ -80,7 +91,7 @@ export async function aiChat(req: AiChatRequest) {
   const resp = await callGateway(buildBody(req, false), "application/json");
   if (!resp.ok) {
     const text = await resp.text();
-    console.error("Lovable AI error", resp.status, text.slice(0, 800));
+    console.error("OpenRouter error", resp.status, text.slice(0, 800));
     throw new AiError(resp.status, text);
   }
   return await resp.json();
@@ -90,10 +101,10 @@ export async function aiStream(req: AiChatRequest): Promise<Response> {
   const resp = await callGateway(buildBody(req, true), "text/event-stream");
   if (!resp.ok || !resp.body) {
     const text = await resp.text().catch(() => "");
-    console.error("Lovable AI stream error", resp.status, text.slice(0, 600));
+    console.error("OpenRouter stream error", resp.status, text.slice(0, 600));
     throw new AiError(resp.status, text || "stream failed");
   }
-  // Gateway is already OpenAI-compatible SSE — pass through.
+  // OpenRouter is OpenAI-compatible SSE — pass through.
   return new Response(resp.body, {
     headers: { "Content-Type": "text/event-stream" },
   });

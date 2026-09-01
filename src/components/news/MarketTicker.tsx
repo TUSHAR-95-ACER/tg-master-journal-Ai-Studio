@@ -130,7 +130,7 @@ export function MarketTicker() {
           {doubled.map((item, i) => (
             <div
               key={`${item.symbol}-${i}`}
-              className="flex items-center gap-3 px-6 border-r border-border/30 last:border-r-0 cursor-default group transition-transform duration-200 hover:scale-105"
+              className="flex items-center gap-3 px-6 border-r border-border/30 last:border-r-0 cursor-default group transition-transform duration-200 hover:scale-105 shrink-0"
             >
               <span className="text-lg">{item.flag}</span>
               <span className="text-sm font-bold text-foreground tracking-wide">

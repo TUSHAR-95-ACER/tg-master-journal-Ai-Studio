@@ -4,11 +4,11 @@
 //   - "polish"  : restructure for readability with headings/bullets when helpful.
 // Returns HTML safe to drop back into Tiptap (paragraphs, headings, lists, strong/em).
 //
-// Auth: LOVABLE_API_KEY (auto-provisioned by Lovable Cloud).
+// Auth: OPENROUTER_API_KEY (set in Supabase Edge Function secrets).
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import { aiChat, aiErrorResponse } from "../_shared/lovable-ai.ts";
+import { aiChat, aiErrorResponse } from "../_shared/openrouter-ai.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -64,7 +64,7 @@ function stripCodeFence(s: string): string {
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  // Require an authenticated caller — prevents anonymous credit drain on LOVABLE_API_KEY.
+  // Require an authenticated caller — prevents anonymous credit drain on OPENROUTER_API_KEY.
   const authHeader = req.headers.get("Authorization");
   if (!authHeader?.startsWith("Bearer ")) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {

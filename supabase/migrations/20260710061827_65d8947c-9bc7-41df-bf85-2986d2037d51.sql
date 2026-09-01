@@ -15,6 +15,15 @@ CREATE TABLE IF NOT EXISTS public.notebook_entries (
   UNIQUE (user_id, entry_id)
 );
 
+-- Ensure columns required by later statements exist when the table was created
+-- by an earlier migration (e.g. create_all_tables.sql) with the legacy shape.
+ALTER TABLE public.notebook_entries ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+ALTER TABLE public.notebook_entries ADD COLUMN IF NOT EXISTS entry_id TEXT;
+ALTER TABLE public.notebook_entries ADD COLUMN IF NOT EXISTS journal JSONB NOT NULL DEFAULT '{"text":"","media":[]}'::jsonb;
+ALTER TABLE public.notebook_entries ADD COLUMN IF NOT EXISTS legacy_notes TEXT;
+ALTER TABLE public.notebook_entries ADD COLUMN IF NOT EXISTS legacy_key_levels TEXT;
+ALTER TABLE public.notebook_entries ADD COLUMN IF NOT EXISTS legacy_image TEXT;
+
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.notebook_entries TO authenticated;
 GRANT ALL ON public.notebook_entries TO service_role;
 

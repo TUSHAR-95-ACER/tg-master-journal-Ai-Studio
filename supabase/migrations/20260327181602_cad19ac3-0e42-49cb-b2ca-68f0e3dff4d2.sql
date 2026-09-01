@@ -1,5 +1,20 @@
 
 -- 1. Profiles table
+-- Drop any pre-existing versions from earlier migrations (e.g. create_all_tables.sql)
+-- so this migration defines the canonical schema and policies.
+DROP TABLE IF EXISTS public.profiles CASCADE;
+DROP TABLE IF EXISTS public.user_settings CASCADE;
+DROP TABLE IF EXISTS public.trading_accounts CASCADE;
+DROP TABLE IF EXISTS public.trades CASCADE;
+DROP TABLE IF EXISTS public.transactions CASCADE;
+DROP TABLE IF EXISTS public.scale_events CASCADE;
+DROP TABLE IF EXISTS public.weekly_plans CASCADE;
+DROP TABLE IF EXISTS public.daily_plans CASCADE;
+-- Also drop the trigger/function that the previous create_all_tables migration
+-- may have installed, so this migration can install the canonical versions.
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS public.handle_new_user();
+
 CREATE TABLE public.profiles (
   id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   full_name text,

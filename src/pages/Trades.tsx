@@ -6,7 +6,6 @@ import { PageHeader } from '@/components/shared/MetricCard';
 import { Button } from '@/components/ui/button';
 const TradeFormDialog = lazy(() => import('@/components/trades/TradeFormDialog').then(m => ({ default: m.TradeFormDialog })));
 const TradeDetailSheet = lazy(() => import('@/components/trades/TradeDetailSheet').then(m => ({ default: m.TradeDetailSheet })));
-import { TradeEntryGate } from '@/components/trades/TradeEntryGate';
 import { TradeGalleryView } from '@/components/trades/TradeGalleryView';
 import { TradeTableRow } from '@/components/trades/TradeTableRow';
 import { Trade } from '@/types/trading';
@@ -19,8 +18,7 @@ import { adaptTrades } from '@/lib/aiInsightAdapters';
 export default function Trades() {
   const { trades, deleteTrade } = useTrading();
   const [searchParams] = useSearchParams();
-  const [showGate, setShowGate] = useState(searchParams.get('new') === 'true');
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(searchParams.get('new') === 'true');
   const [editTrade, setEditTrade] = useState<Trade | null>(null);
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
   const [sortField, setSortField] = useState<'date' | 'profitLoss'>('date');
@@ -88,7 +86,7 @@ export default function Trades() {
   return (
     <div className="px-3 sm:px-4 py-3 w-full">
       <PageHeader title="Trades" subtitle={`${filtered.length} of ${trades.length} trades`}>
-        <Button onClick={() => { setEditTrade(null); setShowGate(true); }} size="sm" className="gap-1.5">
+        <Button onClick={() => { setEditTrade(null); setShowForm(true); }} size="sm" className="gap-1.5">
           <Plus className="h-4 w-4" /> Log Trade
         </Button>
       </PageHeader>
@@ -215,11 +213,6 @@ export default function Trades() {
 
       <AIInsightsPanel page="Trades" payload={adaptTrades(sorted)} className="mt-6" />
 
-      <TradeEntryGate
-        open={showGate}
-        onPass={() => { setShowGate(false); setShowForm(true); }}
-        onCancel={() => setShowGate(false)}
-      />
       <Suspense fallback={null}>
         {(showForm || editTrade) && (
           <TradeFormDialog open={showForm} onOpenChange={setShowForm} editTrade={editTrade} />

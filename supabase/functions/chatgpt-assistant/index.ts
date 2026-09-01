@@ -2,12 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { convertToModelMessages, streamText, type UIMessage } from "npm:ai@7.0.35";
 import { z } from "npm:zod@3.25.76";
-import {
-  createLovableAiGatewayProvider,
-  getLovableAiGatewayRunId,
-  getLovableAiGatewayResponseHeaders,
-  withLovableAiGatewayRunIdHeader,
-} from "../_shared/ai-gateway.ts";
+import { createOpenrouterProvider } from "../_shared/openrouter-provider.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -103,8 +98,8 @@ serve(async (req) => {
       });
     }
 
-    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
-    if (!lovableApiKey) {
+    const openrouterApiKey = Deno.env.get("OPENROUTER_API_KEY");
+    if (!openrouterApiKey) {
       return new Response(JSON.stringify({ error: "AI service not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -189,9 +184,8 @@ serve(async (req) => {
     const context = await fetchJournalContext(supabase, userId);
     const systemPrompt = buildSystemPrompt(context);
 
-    const initialRunId = getLovableAiGatewayRunId(req);
-    const gateway = createLovableAiGatewayProvider(lovableApiKey, initialRunId);
-    const model = gateway("openai/gpt-5.4-mini");
+    const gateway = createOpenrouterProvider(openrouterApiKey);
+    const model = gateway("minimax/minimax-m3:free");
 
     const result = streamText({
       model,
@@ -226,14 +220,13 @@ serve(async (req) => {
     });
 
     const response = result.toUIMessageStreamResponse({
-      headers: getLovableAiGatewayResponseHeaders(undefined, {
+      headers: {
         ...corsHeaders,
         "Content-Type": "text/event-stream",
-        ...(initialRunId ? { "X-Lovable-AIG-Run-ID": initialRunId } : {}),
-      }),
+      },
     });
 
-    return withLovableAiGatewayRunIdHeader(response, gateway, corsHeaders);
+    return response;
   } catch (e) {
     console.error("chatgpt-assistant error:", e);
     return new Response(JSON.stringify({ error: "Internal server error" }), {

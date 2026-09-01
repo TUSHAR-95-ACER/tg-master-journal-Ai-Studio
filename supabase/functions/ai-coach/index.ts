@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import { aiStream, aiErrorResponse, AiError, type AiTier } from "../_shared/lovable-ai.ts";
+import { aiStream, aiErrorResponse, AiError, type AiTier } from "../_shared/openrouter-ai.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -242,8 +242,8 @@ serve(async (req) => {
       });
     }
 
-    // Lovable AI key check
-    if (!Deno.env.get("LOVABLE_API_KEY")) {
+    // OpenRouter API key check
+    if (!Deno.env.get("OPENROUTER_API_KEY")) {
       return new Response(JSON.stringify({ error: "AI service not configured" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -435,7 +435,7 @@ CHART CONTEXT (auto-loaded from journal):
 
       systemPrompt += `
 
-VISION MODE (Gemini Vision):
+VISION MODE:
 You are now looking at the trader's actual chart screenshot${images.length > 1 ? "s" : ""}: ${images.map(i => i.label).join(" | ")}.${tradeCtx}
 
 Analyze the chart visually and combine it with the journal context above. Use institutional / Smart Money Concepts language where it fits the chart:
