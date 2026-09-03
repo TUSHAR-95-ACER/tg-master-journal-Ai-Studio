@@ -133,10 +133,15 @@ export default function Login() {
   }
 
   if (isPasswordRecovery || isRecoveryActive()) {
+    console.info('[auth-debug] Login page redirecting to /reset-password', {
+      isPasswordRecovery,
+      isRecoveryActive: isRecoveryActive(),
+    });
     return <Navigate to="/reset-password" replace />;
   }
 
   if (user) {
+    console.info('[auth-debug] Login page redirecting to nextPath', { nextPath });
     return <Navigate to={nextPath} replace />;
   }
 

@@ -53,10 +53,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
-    console.info('[auth] init', {
+    const __diag = (stage: string, extra: Record<string, unknown> = {}) => {
+      try {
+        const search = window.location.search || '';
+        const hash = window.location.hash || '';
+        const lsKeys: string[] = [];
+        try {
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k) lsKeys.push(k);
+          }
+        } catch {}
+        const verifierKeys = lsKeys.filter((k) => /code-verifier|code_verifier/i.test(k));
+        const authTokenKeys = lsKeys.filter((k) => /sb-.+-auth-token/.test(k));
+        console.info(`[auth-debug] ${stage}`, {
+          origin: window.location.origin,
+          pathname: window.location.pathname,
+          isOAuthReturnPage: search.includes('code=') || hash.includes('access_token='),
+          hasCodeInSearch: search.includes('code='),
+          hasAccessTokenInHash: hash.includes('access_token='),
+          hasRefreshTokenInHash: hash.includes('refresh_token='),
+          hasErrorInSearch: search.includes('error=') || hash.includes('error='),
+          verifierKeyCount: verifierKeys.length,
+          verifierKeyNames: verifierKeys,
+          authTokenKeyCount: authTokenKeys.length,
+          authTokenKeyNames: authTokenKeys,
+          ...extra,
+        });
+      } catch (e) {
+        console.info(`[auth-debug] ${stage} (log-error)`, { message: String(e) });
+      }
+    };
+
+    __diag('init:start', {
       hasUrl: Boolean(import.meta.env.VITE_SUPABASE_URL),
       hasKey: Boolean(import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY),
-      origin: window.location.origin,
     });
 
     if (isRecoveryActive()) {
@@ -65,6 +96,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, nextSession) => {
       authEventSeenRef.current = true;
+      __diag('onAuthStateChange', {
+        event,
+        signedIn: Boolean(nextSession?.user),
+        userId: nextSession?.user?.id ? 'present' : 'absent',
+        hasSession: Boolean(nextSession),
+        expiresAt: nextSession?.expires_at ?? null,
+      });
       console.info('[auth] state change', { event, signedIn: Boolean(nextSession?.user) });
       if (event === 'PASSWORD_RECOVERY') {
         setIsPasswordRecovery(true);
@@ -86,16 +124,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const tryGetSession = async (attempt = 1): Promise<void> => {
       try {
         const { data: { session: currentSession }, error } = await supabase.auth.getSession();
+        __diag('getSession:result', {
+          attempt,
+          hasSession: Boolean(currentSession),
+          hasUser: Boolean(currentSession?.user),
+          userId: currentSession?.user?.id ? 'present' : 'absent',
+          expiresAt: currentSession?.expires_at ?? null,
+          errorName: error?.name ?? null,
+          errorMessage: error?.message ?? null,
+          errorStatus: (error as any)?.status ?? null,
+        });
         if (!mounted || authEventSeenRef.current) return;
         if (error) {
           // Auth-level error (bad/expired refresh token) → clear local session.
           console.warn('[auth] getSession returned error; clearing local session', error);
+          __diag('getSession:error:signingOutLocal', {
+            errorName: error?.name ?? null,
+            errorMessage: error?.message ?? null,
+          });
           supabase.auth.signOut({ scope: 'local' }).catch(() => {});
         }
         setSession(currentSession ?? null);
         setUser(currentSession?.user ?? null);
         setLoading(false);
-      } catch (error) {
+      } catch (error: any) {
+        __diag('getSession:throw', {
+          attempt,
+          errorName: error?.name ?? null,
+          errorMessage: error?.message ?? String(error ?? ''),
+        });
         if (!mounted || authEventSeenRef.current) return;
         // Network/transport failure — retry once after short backoff before
         // assuming the stored session is bad.
@@ -130,6 +187,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithGoogle = async () => {
     try {
       authDebug('google oauth start', { callbackOrigin: window.location.origin });
+      console.info('[auth-debug] signInWithGoogle:start', {
+        origin: window.location.origin,
+        redirectTo: window.location.origin,
+      });
       clearLocalAuthCache();
 
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -137,6 +198,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         options: {
           redirectTo: window.location.origin,
         },
+      });
+
+      console.info('[auth-debug] signInWithGoogle:response', {
+        hasUrl: Boolean(data?.url),
+        urlProviderHost: data?.url ? (() => { try { return new URL(data.url).host; } catch { return 'unparseable'; } })() : null,
+        errorName: error?.name ?? null,
+        errorMessage: error?.message ?? null,
       });
 
       if (error) {

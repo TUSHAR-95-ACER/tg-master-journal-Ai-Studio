@@ -53,6 +53,12 @@ function ShellInner() {
     return <Navigate to="/reset-password" replace />;
   }
 
+  console.info('[auth-debug] AppLayout rendered (no redirect)', {
+    isPasswordRecovery,
+    isRecoveryActive: isRecoveryActive(),
+    userId: 'present',
+  });
+
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar />

@@ -23,6 +23,12 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) {
+    console.info('[auth-debug] ProtectedRoute redirecting to /login', {
+      from: location.pathname,
+      reason: '!user',
+      isPasswordRecovery,
+      isRecoveryActive: isRecoveryActive(),
+    });
     return <Navigate to="/login" replace />;
   }
 

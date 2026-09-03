@@ -41,6 +41,7 @@ export function PostLoginRedirect() {
       return;
     }
     try { sessionStorage.removeItem(STORAGE_KEY); } catch {}
+    console.info('[auth-debug] PostLoginRedirect navigating to saved target', { target, from: location.pathname });
     navigate(target, { replace: true });
   }, [user, loading, navigate, location.pathname, location.search]);
   return null;
